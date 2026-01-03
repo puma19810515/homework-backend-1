@@ -30,6 +30,8 @@ public class NotificationProducer {
                 notification.getId(),
                 notification.getType(),
                 notification.getRecipient(),
+                notification.getSubject(),
+                notification.getContent(),
                 notification.getCreatedAt()
         );
         send(RocketMQConstant.TOPIC_NOTIFICATION, event);

@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface INotificationService {
     
-    NotificationRes add(@Valid AddNotificationReq req);
+    NotificationRes add(AddNotificationReq req);
 
     NotificationRes getById(Long id);
 
     List<Object> recent();
 
-    NotificationRes update(Long id, @Valid UpdateNotificationReq req);
+    NotificationRes update(Long id, UpdateNotificationReq req);
 
     void delete(Long id);
 }

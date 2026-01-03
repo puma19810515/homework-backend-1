@@ -16,5 +16,7 @@ public class NotificationEvent {
     private Long id;
     private NotificationType type;
     private String recipient;
+    private String subject;
+    private String content;
     private Date createdAt;
 }

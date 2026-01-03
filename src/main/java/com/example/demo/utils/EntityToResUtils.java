@@ -1,5 +1,7 @@
 package com.example.demo.utils;
 
+import org.springframework.beans.BeanUtils;
+
 public class EntityToResUtils {
 
     /**
@@ -11,18 +13,10 @@ public class EntityToResUtils {
      * @param <R>
      */
     public static <T, R> R entityToRes(T entity, Class<R> resClass) {
-        if (entity == null) {
-            return null;
-        }
+        if (entity == null) return null;
         try {
             R res = resClass.getDeclaredConstructor().newInstance();
-            // Simple property copying logic (you can use libraries like BeanUtils or ModelMapper for complex cases)
-            for (var field : entity.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                var resField = resClass.getDeclaredField(field.getName());
-                resField.setAccessible(true);
-                resField.set(res, field.get(entity));
-            }
+            BeanUtils.copyProperties(entity, res); // 自動匹配相同欄位
             return res;
         } catch (Exception e) {
             throw new RuntimeException("Error converting entity to response", e);

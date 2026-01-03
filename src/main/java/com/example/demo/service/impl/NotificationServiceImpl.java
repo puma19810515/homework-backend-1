@@ -1,6 +1,8 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.constant.RedisConstant;
+import com.example.demo.exception.ErrorConstant;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.lock.RedisLock;
 import com.example.demo.model.Notification;
 import com.example.demo.mq.producer.NotificationProducer;
@@ -90,7 +92,7 @@ public class NotificationServiceImpl implements INotificationService {
             return cached;
         }
         Notification entity = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstant.NOTIFICATION_NOT_FOUND)
         );
         return EntityToResUtils.entityToRes(entity, NotificationRes.class);
     }
@@ -115,7 +117,7 @@ public class NotificationServiceImpl implements INotificationService {
         NotificationRes res;
         try {
             Notification entity = notificationRepository.findById(id)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                    .orElseThrow(() -> new ResourceNotFoundException(ErrorConstant.NOTIFICATION_NOT_FOUND)
             );
             entity.setContent(req.getContent());
             entity.setSubject(req.getSubject());
@@ -134,7 +136,7 @@ public class NotificationServiceImpl implements INotificationService {
     @Transactional
     public void delete(Long id) {
         if (!notificationRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException(ErrorConstant.NOTIFICATION_NOT_FOUND);
         }
 
         notificationRepository.deleteById(id);
