@@ -12,8 +12,13 @@ import com.example.demo.req.UpdateNotificationReq;
 import com.example.demo.res.NotificationRes;
 import com.example.demo.service.INotificationService;
 import com.example.demo.utils.EntityToResUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class NotificationServiceImpl implements INotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NotificationRepository notificationRepository;
 
@@ -48,6 +55,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CachePut(value = "notificationCache", key = "#result.id")
     public NotificationRes add(AddNotificationReq req) {
 
         String lockKey = RedisConstant.LOCK_NOTIFICATION + RedisConstant.LOCK_ADD_SUFFIX;
@@ -85,6 +93,7 @@ public class NotificationServiceImpl implements INotificationService {
     }
 
     @Override
+    @Cacheable(value = "notificationCache", key = "#id")
     public NotificationRes getById(Long id) {
         String key = RedisConstant.NOTIFICATION_KEY + id;
         NotificationRes cached = (NotificationRes) redisTemplate.opsForValue().get(key);
@@ -105,6 +114,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CachePut(value = "notificationCache", key = "#id")
     public NotificationRes update(Long id, UpdateNotificationReq req) {
         String lockKey = RedisConstant.LOCK_NOTIFICATION + RedisConstant.LOCK_UPDATE_SUFFIX + id;
         String lockValue = UUID.randomUUID().toString();
@@ -134,6 +144,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notificationCache", key = "#id")
     public void delete(Long id) {
         if (!notificationRepository.existsById(id)) {
             throw new ResourceNotFoundException(ErrorConstant.NOTIFICATION_NOT_FOUND);
