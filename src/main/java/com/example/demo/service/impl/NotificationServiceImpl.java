@@ -131,10 +131,13 @@ public class NotificationServiceImpl implements INotificationService {
             );
             entity.setContent(req.getContent());
             entity.setSubject(req.getSubject());
-            Notification updated = notificationRepository.save(entity);
-            res = EntityToResUtils.entityToRes(updated, NotificationRes.class);
+            notificationRepository.save(entity);
 
-            String key = RedisConstant.NOTIFICATION_KEY + updated.getId();
+            notificationRepository.flush();
+            Notification refreshed = notificationRepository.findById(id).get();
+            res = EntityToResUtils.entityToRes(refreshed, NotificationRes.class);
+
+            String key = RedisConstant.NOTIFICATION_KEY + refreshed.getId();
             redisTemplate.opsForValue().set(key, res, 1, TimeUnit.MINUTES);
         } finally {
             redisLock.releaseLock(lockKey, lockValue);

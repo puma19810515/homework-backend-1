@@ -7,7 +7,7 @@ create table notifications
     content    text                                not null,
     recipient  varchar(255)                        not null,
     created_at timestamp default CURRENT_TIMESTAMP null,
-    updated_at timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
+    updated_at timestamp default CURRENT_TIMESTAMP null
 );
 
 create index idx_created_at
